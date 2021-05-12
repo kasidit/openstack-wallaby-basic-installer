@@ -5,7 +5,7 @@
 #
 #
 #!/bin/bash -x
-pwd
+cd /home/vasabi-1234loginname4321-ibasav/OPSInstaller/controller; pwd
 echo "Run this script as a user."
 #read varkey
 source ./admin-openrc.sh

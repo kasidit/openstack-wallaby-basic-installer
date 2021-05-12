@@ -4,7 +4,7 @@
 # copyright 2014 
 #
 #!/bin/bash -x
-pwd
+cd /home/vasabi-1234loginname4321-ibasav/OPSInstaller/network; pwd
 echo "Run with sudo or as root."
 #
 printf "1. configure openvswitch service.. \n"

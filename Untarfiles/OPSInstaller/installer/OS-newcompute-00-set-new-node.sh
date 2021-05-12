@@ -73,7 +73,7 @@ ssh openstack@${newHostname} /home/openstack/OPSInstaller/replace-newcompute-gen
 #
 ssh openstack@${newHostname} /home/openstack/OPSInstaller/remove-all-except-newcompute.sh 
 #
-echo | ssh -t openstack@${newHostname}  sudo /bin/bash -x ./OPSInstaller/newcompute/exe-stage00-SUDO-update.sh | tee log/s00-${newHostname}.log
+echo | ssh -t openstack@${newHostname}  sudo /bin/bash -x ./OPSInstaller/newcompute/exe-stage00-SUDO-update.sh | tee $HOME/log/s00-${newHostname}.log
 #
-ssh -t openstack@${newHostname}  sudo /bin/bash -x ./OPSInstaller/newcompute/exe-stage01-SUDO-set-compute-host-network.sh | tee log/s00-${newHostname}.log
+ssh -t openstack@${newHostname}  sudo /bin/bash -x ./OPSInstaller/newcompute/exe-stage01-SUDO-set-compute-host-network.sh | tee $HOME/log/s00-${newHostname}.log
 printf "\nWait until the rebooted node resume and proceed to run ./OS-newcompute-01-nova-neutron-ovs.sh \n"

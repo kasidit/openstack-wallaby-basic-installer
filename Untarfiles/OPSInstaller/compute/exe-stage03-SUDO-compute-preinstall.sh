@@ -6,7 +6,7 @@
 # run with sudo or as root.
 #
 #!/bin/bash -x
-pwd
+cd /home/vasabi-1234loginname4321-ibasav/OPSInstaller/compute; pwd
 printf "1. set interface/hosts files.. press\n"
 #read varkey
 cp files/interfaces /etc/network/interfaces

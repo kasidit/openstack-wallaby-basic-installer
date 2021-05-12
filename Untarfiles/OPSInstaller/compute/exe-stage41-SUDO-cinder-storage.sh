@@ -6,7 +6,7 @@
 # run with sudo or as root.
 #
 #!/bin/bash -x
-pwd
+cd /home/vasabi-1234loginname4321-ibasav/OPSInstaller/compute; pwd
 echo "Please modify this file to define devices...press anykey"
 read keyvar;
 

@@ -16,7 +16,7 @@ fi
 #
 newHostname=${1}
 #
-ssh -t openstack@${newHostname} sudo /bin/bash -x ./OPSInstaller/newcompute/exe-stage34-SUDO-dvr-compute1-conf.sh | tee log/s34-${newHostname}-compute.log
+ssh -t openstack@${newHostname} sudo /bin/bash -x ./OPSInstaller/newcompute/exe-stage34-SUDO-dvr-compute1-conf.sh | tee $HOME/log/s34-${newHostname}-compute.log
 sleep 5
-ssh -t openstack@controller /bin/bash -x ./OPSInstaller/controller/exe-stage35-USER-verify-dvr-network.sh | tee log/s35-${newHostname}-controller.log
+ssh -t openstack@controller /bin/bash -x ./OPSInstaller/controller/exe-stage35-USER-verify-dvr-network.sh | tee $HOME/log/s35-${newHostname}-controller.log
 printf "\nDone!\n"

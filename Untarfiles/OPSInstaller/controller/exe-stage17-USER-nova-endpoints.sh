@@ -5,7 +5,7 @@
 #
 #
 #!/bin/bash -x
-pwd
+cd /home/vasabi-1234loginname4321-ibasav/OPSInstaller/controller; pwd
 echo "Run this script  as user."
 echo -n "Create nova user and endpoint..."
 #read varkey

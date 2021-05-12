@@ -20,16 +20,16 @@ scp OPSInstaller.tar openstack@compute:/home/openstack/OPSInstaller.tar
 #
 echo "remove existing OPSInstaller on controller node"
 #read varkey
-ssh openstack@controller rm -rf /home/openstack/OPSInstaller | tee log/extract-controller-current.log
+ssh openstack@controller rm -rf /home/openstack/OPSInstaller 
 echo "remove existing OPSInstaller on compute node"
 #read varkey
-ssh openstack@compute rm -rf /home/openstack/OPSInstaller | tee log/extract-compute-current.log
+ssh openstack@compute rm -rf /home/openstack/OPSInstaller 
 #
 
 echo "extract installer files on controller.. press"
 #read varkey
-ssh openstack@controller tar xvf /home/openstack/OPSInstaller.tar | tee log/extract-controller-current.log
+ssh openstack@controller tar xvf /home/openstack/OPSInstaller.tar 
 echo "extract installer files on compute node.. press"
 #read varkey
-ssh openstack@compute tar xvf /home/openstack/OPSInstaller.tar | tee log/extract-compute-current.log
+ssh openstack@compute tar xvf /home/openstack/OPSInstaller.tar 
 #ssh openstack@compute /home/openstack/OPSInstaller/remove-all-except-compute.sh

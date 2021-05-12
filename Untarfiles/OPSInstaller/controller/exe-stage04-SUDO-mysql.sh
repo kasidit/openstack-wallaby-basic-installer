@@ -8,7 +8,7 @@
 # Run this with sudo or as root
 
 #!/bin/bash -x
-pwd
+cd /home/vasabi-1234loginname4321-ibasav/OPSInstaller/controller; pwd
 echo "check chrony"
 chronyc sources
 sleep 1

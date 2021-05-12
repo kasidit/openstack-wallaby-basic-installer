@@ -9,5 +9,5 @@
 #
 # restore  sudoers
 #!/bin/bash -x
-pwd
+cd /home/vasabi-1234loginname4321-ibasav/OPSInstaller/compute1; pwd
 cp files/sudoers.save /etc/sudoers

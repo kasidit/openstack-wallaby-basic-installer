@@ -10,7 +10,7 @@
 #
 #!/bin/bash 
 #
-pwd
+cd /home/vasabi-1234loginname4321-ibasav/OPSInstaller/compute; pwd
 
 cp files/hosts /etc/hosts
 #cp /etc/apt/sources.list /etc/apt/sources.list.saved
@@ -19,8 +19,8 @@ cp files/hosts /etc/hosts
 apt-get update
 #printf "set repo and update\n"
 #apt-get -y install software-properties-common
-#add-apt-repository cloud-archive:ussuri
-add-apt-repository ppa:ubuntu-cloud-archive/wallaby-updates
+add-apt-repository cloud-archive:wallaby
+#add-apt-repository cloud-archive:wallaby
 #
 # assume the controller is up to date.
 #
