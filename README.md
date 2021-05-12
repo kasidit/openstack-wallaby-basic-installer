@@ -1,24 +1,13 @@
-# openstack-wallaby-installer
+# openstack-wallaby-basic-installer
 
-Copyright 2021 Kasidit Chanchio 
+Copyright 2018 Kasidit Chanchio 
 
 Author: กษิดิศ ชาญเชี่ยว <br>
 Contact: kasiditchanchio@gmail.com <br>
 
 <p>
-<h2>Tutorial: การติดตั้งระบบ OpenStack Wallaby แบบ Multi-node & DVR ด้วย installation scripts บน ubuntu 20.04 </h2> <br>
+<h2>Tutorial: การติดตั้งระบบ OpenStack Ussuri แบบ Multi-node & DVR ด้วย installation scripts บน ubuntu 20.04 </h2> <br>
 <p>
-<h3>Notes:</h3><br> 
-This repo contains scripts for OpenStack wallaby installation on Ubuntu 20.04. The OpenStack components 
-that can be installed by this scripted are keystone, glance, nova, nuetron, horizon, cinder (lvm), 
-and octavia. We have tested the installtion for the 4Nodes-regular-network deployments.
-<p><p>
-In this current version, the scripts for other kinds of deployments must be rewritten 
-or modified based on the 4Nodes one. The description below works from begining to section 2.2. 
-On section 2.3, the scripts in installer directory no longger works. You need to use 
-detailed scripts on every openstack hosts to install. 
-The add node script in section 3 has not been tested for this version of OpenStack.    
-<p><p>
 ให้ท่านเตรียมเครื่องตามส่วนที่ 1 และหลังจากนั้นเลือกเอาว่าจะติดตั้งด้วย scripts(ส่วนที่ 2) หรือด้วยมือ (ส่วนที่ 3)  
 <ul>
  <li> 1. <a href="#part1">ส่วนที่ 1: เตรียมเครื่องและเนตสำหรับติตดั้ง</a>
@@ -27,30 +16,26 @@ The add node script in section 3 has not been tested for this version of OpenSta
       </ul>
  <li> 2. <a href="#part2">ส่วนที่ 2: ติดตั้งด้วย scripts</a> 
       <ul>
-       <li> <a href="#downloadinstaller">2.1 ดาวน์โหลด openstack-queens-installer scripts</a>
+       <li> <a href="#downloadinstaller">2.1 ดาวน์โหลด openstack-wallaby-basic-installer scripts</a>
        <li> <a href="#paramrc">2.2 กำหนดค่าพารามีเตอร์สำหรับการติดตั้ง </a>
-       <li> <a href="#usescript">2.3 ติดตั้ง OpenStack queens ด้วย scripts </a> 
+       <li> <a href="#usescript">2.3 ติดตั้ง OpenStack ด้วย scripts </a> 
        <li> <a href="#addnodes">2.4 การเพิ่ม compute node ด้วย scripts </a>
       </ul>
- <li> 3. <a href="#part3">ส่วนที่ 3: การเพิ่มเครื่องจริงเป็น compute node </a> 
- <li> 4. <a href="#part4">ส่วนที่ 4: สรุป</a>
+ <li> 4. <a href="#part4">ส่วนที่ 3: สรุป</a>
 </ul>
-<table>
-<tr><td><b>แจ้งปัญหาหรือข้อผิดพลาด:</b> หากมีส่วนใดของเเนื้อหาใน web นี้ที่เป็น BUGS หรือมีข้อแนะนำขอให้แจ้งได้ที่ kasiditchanchio@gmail.com นะครับ ขอบคุณครับ </td></tr>
-</table>
 <p>
 <a id="part1"><h3>ส่วนที่ 1: เตรียมเครื่อง host และ networks สำหรับติดตั้ง</h3></a>
 <p><p>
 ในคู่มือนี้เราจะแนะนำการติดตั้งบนเครื่อง host จำนวนหนึ่งซึ่งมีลักษณะดังนี้
 <ul>
-  <li>เป็น host ที่ถูกสร้างขึ้นด้วย KVM hypervisor บนเครื่อง physical host (Ubuntu 16.04) เดียวกันจำนวน 4 เครื่อง
+  <li>เป็น host ที่ถูกสร้างขึ้นด้วย KVM hypervisor บนเครื่อง physical host (Ubuntu 20.04) เดียวกันจำนวน 4 เครื่อง
   <li>เป็น host ที่ถูกสร้างขึ้นด้วย virtualbox (vbox) hypervisor บนเครื่อง physical host (Windows 10) เดียวกันจำนวน 4 เครื่อง
 </ul>
 <p><p>
 <p>
  <i><a id="kvmhost"><h4>1.1 การเตรียมเครื่องเพื่อติดตั้งบน KVM Virtual Machine (VM)</h4></a></i>
 <p> 
-  ขอให้เตรียมเครื่อง ubuntu 16.04.x จำนวน 4 เครื่องเชื่อมต่อกันบนเนตดังภาพที่ 1 ได้แก่เครื่องชื่อ controller network compute และ compute1 (ชื่อเครื่องต้องตรงกับผลจากคำสั่ง hostname) จากภาพกำหนดให้เครื่องที่ controller มี spec แนะนำคือ cpu 4 cores RAM 6 ถึง 8 GB Disk 16-20 GB เครื่อง network มี cpu 1-2 cores RAM 512MB-1GB Disk 8-10 GB เครื่อง compute และ compute1 มี cpu 4 cores RAM 2-4 GB Disk 16-20 GB (เป็น spec ใช้สำหรับการศึกษา ถ้าจะ deploy ขอให้ดู official OpenStck document) 
+  ขอให้เตรียมเครื่อง ubuntu 20.04.x จำนวน 4 เครื่องเชื่อมต่อกันบนเนตดังภาพที่ 1 ได้แก่เครื่องชื่อ controller network compute และ compute1 (ชื่อเครื่องต้องตรงกับผลจากคำสั่ง hostname) จากภาพกำหนดให้เครื่องที่ controller มี spec แนะนำคือ cpu 4 cores RAM 6 ถึง 8 GB Disk 16-20 GB เครื่อง network มี cpu 1-2 cores RAM 512MB-1GB Disk 8-10 GB เครื่อง compute และ compute1 มี cpu 4 cores RAM 2-4 GB Disk 16-20 GB (เป็น spec ใช้สำหรับการศึกษา ถ้าจะ deploy ขอให้ดู official OpenStck document) 
   <p>
   <img src="documents/OPS-queens-architecture.png"> <br>
    ภาพที่ 1 <br>
@@ -298,153 +283,7 @@ openstack@compute1:~$
 </td></tr> 
 </table>
 <p><p>
-<table>
-<tr><td>
-<details>
-<summary><b>[กดเพื่อดูรายละเอียด] ในกรณีที่ท่านใช้ btrfs: การสร้าง snapshot บน btrfs บน ubuntu 16.04 host</b></summary>
-เนื้อหาในส่วนนี้ใช้สำหรับผู้ที่ประสงค์ใช้ btrfs เป๋น file system ของ host computers ที่จะใช้ติดตั้ง openstack และต้องการทำ snapshot ของ partition ที่ใช้ในการติดตั้งบนแต่ละเครื่องเป็นระยะๆ ถ้าท่านไม่ได้ใช้ btrfs ก็ให้ข้ามส่วนนี้ไป
-<p><p>
-ท่านสามารถติดตั้ง btrfs บน ubuntu 16.04 บนเครื่อง controller network compute compute1 hosts ระหว่างการติดตั้ง OS เมื่อกำหนด disk partitioning
-<ul>
-<li>
-<details>
-<summary>[กดเพื่อดูรายละเอียด] ภาพ setup btrfs ที่ 1 </summary> 
-  <p>
-  <img src="documents/btrfssetup1.png"> <br>
-</details>
-<li>
-<details>
-<summary>[กดเพื่อดูรายละเอียด] ภาพ setup btrfs ที่ 2</summary> 
-  <p>
-  <img src="documents/btrfssetup2.png"> <br>
-</details>
-<li>
-<details>
-<summary>[กดเพื่อดูรายละเอียด] ภาพ setup btrfs ที่ 3</summary> 
-  <p>
-  <img src="documents/btrfssetup3.png"> <br>
-</details>
-<li>
-<details>
-<summary>[กดเพื่อดูรายละเอียด] ภาพ setup btrfs ที่ 4</summary> 
-  <p>
-  <img src="documents/btrfssetup4.png"> <br>
-</details>
-<li>
-<details>
-<summary>[กดเพื่อดูรายละเอียด] ภาพ setup btrfs ที่ 5</summary> 
-  <p>
-  <img src="documents/btrfssetup5.png"> <br>
-</details>
-<li>
-<details>
-<summary>[กดเพื่อดูรายละเอียด] ภาพ setup btrfs ที่ 6</summary> 
-  <p>
-  <img src="documents/btrfssetup6.png"> <br>
-</details>
-<li>
-<details>
-<summary>[กดเพื่อดูรายละเอียด] ภาพ setup btrfs ที่ 7</summary> 
-  <p>
-  <img src="documents/btrfssetup7.png"> <br>
-</details>
-<li>
-<details>
-<summary>[กดเพื่อดูรายละเอียด] ภาพ setup btrfs ที่ 8</summary> 
-  <p>
-  <img src="documents/btrfssetup8.png"> <br>
-</details>
-</ul>
-หลังจากนั้นให้ติดตั้ง ubuntu ต่อตามปกติ 
-<p><p>
-เมื่อติดตั้งเสร็จแล้ว ให้ท่าน login เข้าสู่เครื่องนั้นและดู btrfs subvolume ที่มีอยู่ในเครื่อง host ซึ่งหลังจากการติดตั้งข้างต้น ubuntu 16.04 จะสร้าง btrfs subvolmes สำหรับ / และ /home directory ให้ตั้งแต่เริ่มต้น
-<pre>
-$ sudo su
-# df -h
-Filesystem      Size  Used Avail Use% Mounted on
-udev            2.0G     0  2.0G   0% /dev
-tmpfs           396M  5.5M  390M   2% /run
-/dev/sda1        10G  2.0G  6.3G  25% /
-tmpfs           2.0G     0  2.0G   0% /dev/shm
-tmpfs           5.0M     0  5.0M   0% /run/lock
-tmpfs           2.0G     0  2.0G   0% /sys/fs/cgroup
-/dev/sda1        10G  2.0G  6.3G  25% /home
-tmpfs           396M     0  396M   0% /run/user/1000
-# 
-# mount /dev/sda1 /mnt 
-#
-</pre>
-ท่านต้อง modify ไฟล์ /etc/fstab ด้วยการเพิ่มบรรทัดข้างล่าง เพื่อให้มีการสร้าง /mnt directory และ mount เข้ากับ /dev/sda1 device โดยอัตโนมัติเมื่อมีการ reboot
-<p><p>
-<pre>
-# vi /etc/fstab
-...
-/dev/sda1       /mnt            btrfs   defaults   0    1
-...
-(ให้เซฟไฟล์ และออกจาก vi)
-#
-</pre>
-ในอันดับถัดไปให้ list btrfs subvolume ซึ่ง ubuntu จะสร้าง subvolume /mnt/@ สำหรับ / directory และ /mnt/@home สำหรับ /home directory
-<p><p>
-<pre>
-# btrfs subvolume list /mnt
-ID 261 gen 7810 top level 5 path @
-ID 262 gen 7702 top level 5 path @home
-#
-</pre>
-ท่านสามารถทำ defragmentation ด้วยคำสั่งต่อไปนี้
-<p><p>
-<pre>
-# btrfs filesystem defrag /mnt
-</pre>
-ท่านสามารถทำ snapshot ของ /mnt/@ และ /mnt/@home ดังนี้
-<p><p>
-<pre>
-# <b>btrfs subvolume snapshot /mnt/@ /mnt/@_snapshot1</b>
-Create a snapshot of '/mnt/@' in '/mnt/@_snapshot1'
-# <b>btrfs subvolume snapshot /mnt/@home /mnt/@home_snapshot1</b>
-Create a snapshot of '/mnt/@home' in '/mnt/@home_snapshot1'
-# btrfs subvolume list /mnt
-ID 261 gen 7812 top level 5 path @
-ID 262 gen 7813 top level 5 path @home
-ID 264 gen 7812 top level 5 path @_snapshot1
-ID 265 gen 7813 top level 5 path @home_snapshot1
-#
-</pre>
-หลังจากนั้น ถ้าท่านติดตั้ง openstack แล้วเกิดความผืดพลาดขึ้น ท่านสามารถกู้คืน / และ /home ด้วยคำสั่งต่อไปนี้ 
-<p><p>
-<pre>
-# mv /mnt/@ /mnt/@_badroot
-# mv /mnt/@home /mnt/@_badhome
-# mv /mnt/@_snapshot1 /mnt/@
-# mv /mnt/@home_snapshot1 /mnt/@home
-#
-# reboot
-</pre>
-เมื่อ reboot เสร็จแล้ว ให้ login เข้าเครื่อง sudo เป็น root แล้ว ลบ /mnt/@_badroot และ /mnt/@_badhome
-<p><p>
-<pre>
-# btrfs subvolume delete /mnt/@_badroot
-# btrfs subvolume delete /mnt/@_badhome
-</pre>
-หลังจากนั้นให้สร้าง snapshot ของ /mnt/@ และ /mnt/@home อีกครั้งหนึ่ง
-<p><p>
-<pre>
-# btrfs subvolume snapshot /mnt/@ /mnt/@_snapshot1
-# btrfs subvolume snapshot /mnt/@home /mnt/@home_snapshot1
-# btrfs filesystem defrag /mnt
-</pre>
-ผม recommend ให้ทุกท่านทำ snapshot ของ /mnt/@ และ /mnt/@home เมื่อผ่านการติดตั้งที่สำคัญๆ เผื่อว่าการติดตั้งในอนาคตผิดพลาด นศ จะได้ recover snapshot ล่าสุดได้
-</details>
-</td></tr>
-</table>
-<p><p>
 <p>
- <i><a id="kvmhost"><h4>1.2 การเตรียมเครื่องเพื่อติดตั้งบน Virtualbox VM</h4></a></i>
-<p>
-<p><p>
-TBA
-<p><p>
 <a id="part2"> 
 <h3>ส่วนที่ 2: ติดตั้งด้วย scripts</h3>
 </a>
@@ -454,8 +293,8 @@ TBA
 นศ จะใช้เครื่อง controller เป็นหลักในการติดตั้งด้วย script เริ่มต้นด้วยการ login เข้า openstack user (makes sure ว่า username และ password คือ "openstack" บนทุกเครื่อง) และ download script ด้วยคำสั่ง 
 <pre>
 $ cd $HOME
-$ git clone https://github.com/kasidit/openstack-queens-installer
-$ cd openstack-queens-installer
+$ git clone https://github.com/kasidit/openstack-wallaby-basic-installer
+$ cd openstack-wallaby-basic-installer
 </pre>
 <p>
 เมื่อดู content ของ directory จะมีไฟล์และ subdirectory ดังนี้
@@ -466,70 +305,11 @@ documents  example.install-paramrc.sh install-paramrc.sh       OPSInstaller-init
 $
 </pre> 
 <p>
-<i><a id="paramrc"><h4>2.2 กำหนดค่าพารามีเตอร์สำหรับการติดตั้ง </h4></a></i>
+<i><a id="paramrc"><h4>2.1 กำหนดค่าพารามีเตอร์สำหรับการติดตั้ง </h4></a></i>
 <p>
 ต่อไป ท่านจะกำหนด configuration parameters สำหรับการติดตั้งโดยกำหนดค่าในไฟล์ <a href="https://github.com/kasidit/openstack-queens-installer/blob/master/install-paramrc.sh">install-paramrc.sh</a> ซึ่งถ้าท่านกำหนดค่า vm และเนตตามที่ระบุใน ส่วนที่ 1.1 และติดตั้งบน host ที่เป็น vm ที่รองรับ kvm nested virtualization (ที่ใช้รหัส ensXX โดยที่ XX เป็นตัวเลข positive interger เป็นชื่อ NIC) ท่านก็สามารถใช้ไฟล์ install-paramrc.sh นี้ได้เลย 
 <p><p>
-<p>
- <i><a id="kvmhost"><h4>2.2.1 กำหนดค่าโดยใช้ไฟล์ตัวอย่างสำหรับ KVM host หรือ vbox host</h4></a></i>
-<p>
-<p><p>
-เรามีตัวอย่าง install-paramrc.sh สำหรับการติดตั้งบน host แบบอื่นๆใน directory <a href="https://github.com/kasidit/openstack-queens-installer/tree/master/example.install-paramrc.sh"><b>example.install-paramrc.sh</b></a> ดังตารางต่อไปนี้
-<table>
-<tr>
-   <th> No. </th>
-   <th> Filename </th>
-   <th> ชนิด Host VM</th>
-   <th> ชนิด VM Hypervisor ที่รันบน Host</th>
-   <th> หมายเหตุ </th>
-</tr>
-<tr>
-   <th> 1 </th>
-   <th> install-paramrc.sh.kvm.on_kvm_hosts </th>
-   <th> Host เป็น VM ที่สร้างด้วย KVM </th>
-   <th> ใช้ KVM เป็น hypervisor</th>
-   <th> Physical Host มี Nested Virt </th>
-</tr>
-<tr>
-   <th> 2 </th>
-   <th> install-paramrc.sh.kvm.on_vbox_hosts </th>
-   <th> Host เป็น VM ที่สร้างด้วย virtualbox </th>
-   <th> ใช้ KVM เป็น hypervisor</th>
-   <th> Physical Host มี Nested Virt </th>
-</tr>
-<tr>
-   <th> 3 </th>
-   <th> install-paramrc.sh.qemu.on_kvm_hosts </th>
-   <th> Host เป็น VM ที่สร้างด้วย KVM </th>
-   <th> ใช้ qemu เป็น hypervisor</th>
-   <th> Physical Host ไม่มี Nested Virt </th>
-</tr>
-<tr>
-   <th> 4 </th>
-   <th> install-paramrc.sh.qemu.on_vbox_hosts </th>
-   <th> Host เป็น VM ที่สร้างด้วย virtualbox </th>
-   <th> ใช้ qemu เป็น hypervisor</th>
-   <th> Physical Host ไม่มี Nested Virt <br>
-        <b>ในการติดตั้งบน vbox ส่วนใหญ่จะใช้ไฟล์นี้</b> </th>
-</tr>
-</table>
-โดย default แล้วไฟล์ <a href="https://github.com/kasidit/openstack-queens-installer/blob/master/install-paramrc.sh">install-paramrc.sh</a> จะเป็นแบบที่ 1 
-<p><p>
-ในกรณีที่ท่านใช้ virtualbox สร้าง Host VM ทั้ง 4 ใน section 1.1 ชื่อ interfaces ต่างๆจะเปลี่ยนไป และท่านจะต้องใช้ไฟล์ install-paramrc.sh.qemu.on_vbox_hosts มาเป็น install-paramrc.sh โดย copy มาทับของเดิมด้วยคำสั่ง
-<pre>
-$ ls
-config.d   exe-config-installer.sh  LICENSE                README.md
-documents  example.install-paramrc.sh install-paramrc.sh       OPSInstaller-init.tar
-$
-$ cp example.install-paramrc.sh/install-paramrc.sh.qemu.on_vbox_hosts  install-paramrc.sh
-$
-</pre>
-<p><p>
-<p>
- <i><a id="kvmhost"><h4>2.2.2 กำหนดค่าโดยใช้ไฟล์ตัวอย่างสำหรับเครื่อง physical host หรือ host VM อื่นๆ</h4></a></i>
-<p>
-<p><p>
-ในกรณีที่ท่านติดตั้งบน Host ที่เป็น Physical Host คือเป็นเครื่องจริง ชื่อ NICs และค่าอื่นๆก็จะเปลี่ยนไป ซึ่งผมจะอธิบายความหมายของตัวแปรต่างๆในไฟล์ install-paramrc.sh เพื่อที่จะได้กำหนดค่าอย่างถูกต้องดังต่อไปนี้ 
+ผมจะอธิบายความหมายของตัวแปรต่างๆในไฟล์ install-paramrc.sh เพื่อที่จะได้กำหนดค่าอย่างถูกต้องดังต่อไปนี้ 
 <p><p>
 อันดับแรก environment variables สามตัวแรกในไฟล์นี้ได้แก่
 <pre>
@@ -564,17 +344,13 @@ export HYPERVISOR=qemu
 <p><p>
 สำหรับตัวแปรถัดไปต่อไปนี้ ท่านอาจไม่ต้องไปยุ่งกับมันก็ได้ มันเป็นการกำหนดค่า url ของ cirros OS image ที่ script จะไป download มา ตัวแปร LOCAL_REPO เป็นการกำหนดค่า apt repository และตัวแปร NTP_SERVER เป็นตัวแปรกำหนดค่า NTP server ซึ่งถ้าติดตั้งในเมืองไทยคงไม่ต้องเปลี่ยนอะไร
 <pre>
-export INIT_IMAGE_LOCATION=http:\\/\\/download.cirros-cloud.net\\/0.3.5\\/cirros-0.3.5-x86_64-disk.img
+export INIT_IMAGE_LOCATION=http:\\/\\/download.cirros-cloud.net\\/0.4.0\\/cirros-0.4.0-x86_64-disk.img
 export INIT_IMAGE_NAME=cirros
 #
 export DOMAINNAME=cs.tu.ac.th
 #
-# Ubuntu Repository Parameters
-#
-export LOCAL_REPO=th.archive.ubuntu.com
-export LOCAL_SECURITY_REPO=security.ubuntu.com
-#
 # ntp servers
+#
 export NTP_SERVER0=0.th.pool.ntp.org
 export NTP_SERVER1=1.th.pool.ntp.org
 export NTP_SERVER2=2.th.pool.ntp.org
@@ -585,8 +361,6 @@ export NTP_SERVER3=3.th.pool.ntp.org
 อันดับถัดไปจะเป็นการกำหนดค่า network configuration ในกรณีที่ ท่านจะติดตั้งด้วย script และต้องการกำหนดค่าตัวแปรที่แตกต่างจากที่ระบุในส่วนที่ 1 ท่านควรทราบความหมายของตัวแปรเหล่านี้ 
 <details>
 <summary><b>[กดเพื่อดูรายละเอียด] ภาพที่ 3 แสดงการ mapping ของค่าตัวแปรใน install-paramrc.sh กับค่า network configuration ในภาพที่ 1</b></summary> 
-  <p>
-  <img src="documents/OPS-queens-architecture.png"> <br>
   <p>
   <img src="documents/OPS-queens-architecture-vars.png"> <br>
    ภาพที่ 3 <br>
@@ -655,7 +429,7 @@ export VLAN_COMPUTE_NODE_IP_NIC=ens5
 
 <p>
 <p>
-<i><a id="usescript"><h4>2.3 การติดตั้ง OpenStack queens ด้วย scripts </h4></a></i>
+<i><a id="usescript"><h4>2.2 การติดตั้ง OpenStack ด้วย scripts </h4></a></i>
 <p>
 <p>
 เริ่มต้นการติดตั้งด้วยคำสั่งต่อไปนี้ (หมายเหตุ ท่านผู้อ่านต้องออกคำสั่งใน user mode คือเป็น openstack user ห้ามใช้ sudo จนจบ script เหล่านี้) 
@@ -684,52 +458,9 @@ script นี้จะ remote ssh เข้าไปที่เครื่อ�
 host$ ssh openstack@10.0.0.11
 openstack@10.0.0.11's password:
 $
-$ cd openstack-queens-installer/OPSInstaller/installer/
+$ cd openstack-wallaby-basic-installer/OPSInstaller/installer/
 $ 
 </pre>
-<p><p>
-<table>
-<tr><td>
-<details>
-<summary><b>[กดเพื่อดูรายละเอียด] ในกรณีที่ท่านใช้ btrfs: ท่านสามารถใช้ script ทำ snapshot ของทั้ง cluster ได้</b></summary>
-ท่านจะใช้ ./OS-cluster-btrfs-snapshot.sh script ด้วย option snapshot ตามด้วยชื่อ "OSi-00" เพื่อสร้าง snapshots สำหรับ / และ /home file systems และให้ชื่อว่า /mnt/@_snap_OSi-00 และ /mnt/@home_snap_OSi-00 ตามลำดับ ผม recommend ให้ท่านทำ snapshot ทุกครั้งหลังจากรัน installer script ในแต่ละขั้นเสร็จ
-<pre>
-$  ./OS-cluster-btrfs-snapshot.sh snapshot OSi-00
-On controller:
-+ btrfs subvolume snapshot /mnt/@ /mnt/@_snap_OSi-00
-Create a snapshot of '/mnt/@' in '/mnt/@_snap_OSi-00'
-+ btrfs subvolume snapshot /mnt/@home /mnt/@home_snap_OSi-00
-Create a snapshot of '/mnt/@home' in '/mnt/@home_snap_OSi-00'
-Connection to controller closed.
-On network:
-+ btrfs subvolume snapshot /mnt/@ /mnt/@_snap_OSi-00
-Create a snapshot of '/mnt/@' in '/mnt/@_snap_OSi-00'
-+ btrfs subvolume snapshot /mnt/@home /mnt/@home_snap_OSi-00
-Create a snapshot of '/mnt/@home' in '/mnt/@home_snap_OSi-00'
-Connection to network closed.
-On compute:
-+ btrfs subvolume snapshot /mnt/@ /mnt/@_snap_OSi-00
-Create a snapshot of '/mnt/@' in '/mnt/@_snap_OSi-00'
-+ btrfs subvolume snapshot /mnt/@home /mnt/@home_snap_OSi-00
-Create a snapshot of '/mnt/@home' in '/mnt/@home_snap_OSi-00'
-Connection to compute closed.
-On compute1:
-+ btrfs subvolume snapshot /mnt/@ /mnt/@_snap_OSi-00
-Create a snapshot of '/mnt/@' in '/mnt/@_snap_OSi-00'
-+ btrfs subvolume snapshot /mnt/@home /mnt/@home_snap_OSi-00
-Create a snapshot of '/mnt/@home' in '/mnt/@home_snap_OSi-00'
-Connection to compute1 closed.
-Done!
-$
-</pre>
-Recommend ให้ท่านทำ snapshot ของทั้ง cluster (ถ้าท่านใช้ btrfs) สมมุติว่าผมต้องการตั้งชื่อของ snapshot หลังจากทำการติดตั้งแต่ละขั้นเสร็จว่า OSi-XX หมายถึง OpenStack installation หลังจากขั้นที่ XX เสร็จ เช่นเมื่อทำ ./OS-installer-01-node-setups.sh เสร็จ ผมก็จะป้อนคำสั่งเพื่อสร้าง snapshot คือ
-<p><p>
-<pre>
-$ ./OS-cluster-btrfs-snapshot.sh snapshot OSi-01
-</pre>
-</details>
-</td></tr>
-</table>
 <p><p>
 ในอันดับถัดไป เราจะเริ่มต้นด้วยการกำหนดค่า network configurations ที่จำเป็นสำหรับการติดตั้ง openstack ด้วย OS-installer-01-node-setups.sh ซึ่งจะกำหนดค่าและ ifup interfaces ต่างๆบนทุกๆเครื่องในภาพที่ 1 และติดตั้ง chrony เพื่อ sync เวลาระหว่าง NTP server กับ controller และระหว่าง controller กับทุกๆ node 
 <pre>
@@ -847,7 +578,7 @@ $ ./OS-installer-10-horizon.sh
 </pre>
 ท่านจะได้ ubuntu openstack dashbord โดย default
 <p><p>
-<i><a id="addnodes"><h4>2.4 การเพิ่ม Compute node ด้วย scripts </h4></a></i>
+<i><a id="addnodes"><h4>2.3 การเพิ่ม Compute node ด้วย scripts </h4></a></i>
 <p><p>
 ก่อนอื่นเราสมมุติว่าท่านมีเครื่อง ubuntu 16.04 จำนวน 1 เครื่องอยู่โดยที่เรา Assume ว่าทั้งสองเครื่องนั้นมี network interfaces เหมือนกับ compute1 ก่อนที่ compute1 จะได้รับการรัน scripts ของเราใดๆ และกำหนดให้เครื่องมีรายละเอียดที่แตกต่างจาก compute1 ดังนี้
 <ul>
@@ -971,54 +702,9 @@ Connection to controller closed.
 Done!
 $
 </pre>
-<p><p>
-<a id="part3"> 
-<h3>ส่วนที่ 3: การเพิ่มเครื่องจริงเป็น compute node </h3>
-</a>
-<p>
-สมมุติว่าเริ่มต้นคุณติดตั้ง OpenStack บน VM โดยกำหนดให้มี controller network และ compute เราสามารถเพิ่มเครื่องจริงเป็น compute node ใหม่ได้โดยใช้ newnode script ดังที่ได้ยกตัวอย่างก่อนหน้า สมมุติว่าคุณใช้ bridge network "br0" เชื่อม management network กับ VM ทุกเครื่อง ก่อนที่คุณจะเพิ่มเครื่องจริงเข้ามาใน compute node pool ของ OpenStack และคุณต้องเตรียม Network ดังนี้
-<ul>
- <li> Nic1 ต่อเข้ากับ management network 
- <li> Nic2 เชื่อมต่อกับ data tunnel network (เครื่อง host ที่มี controller มี Linux bridge หรือ OVS ต่อกับ physical Nic ที่เชื่อมกับ network นี้)
- <li> Nic3 เชื่อมต่อกับ vlan network
- <li> Nic4 เชื่อมต่อกับ External network
-</ul>
-ก่อนเริ่มการจิดตั้งให้ make sure ว่าทุกเครื่องมีเวลาเหมือนกัน ให้ใช้คำสั่งนี้บนทุกเครื่อง
-<pre>
-$ sudo ntpdate 2.debian.pool.ntp.org
-</pre>
-สมมุติว่า Nic1 คือ br0 และ Nic2 คือ dataif และ Nic3 คือ vlanif และ Nic4 คือ enp3s4f1 โดยที่บางอันได้มาดังนี
-<pre>
-$ sudo ovs-vsctl add-port br-data dataif -- set interface dataif type=internal
-$ sudo ovs-vsctl add-port br-vlan vlanif -- set interface vlanif type=internal
-$ ifconfig enp3s4f1
-$ # if no physical net for external network 
-$ # sudo ip tuntap add dev extbr0 mode tap
-$ # sudo brctl addif br0 extbr0
-</pre>
-หลังจากนั้นให้รัน script 
-<pre>
-$ ./OS-newcompute-00-set-new-node.sh sushi8 br0 10.100.20.155 dataif0f0 dataif 10.0.1.48 enp4s0f1 vlanif enp5s0f0 enp5s0f1 10.100.20.152
-.141
-</pre>
-หลังจากรันแล้ว script อาจลบ br0 network configuration และ enp3s4f0 ออกจาก /etc/network/interfaces ขอให้กลับเข้าไปใส่ configuration และ ifup iface เหล่านี้
-<p><p> 
- <b>การลบ compute node จาก openstack</b>
- <p><p>
-  บนเครื่อง controller 
-  <pre>
-  $ openstack compute service set --disable compute1 nova-compute
-  $ openstack compute service list
-  $ openstack compute service delete <service_id>
-  $ openstack network agent list
-  $ openstack network agent delete 
-  $
-  </pre>
-  อ้างอิง [4]
- 
  
 <a id="part4"> 
-<h3>ส่วนที่ 4: สรุป</h3></a>
+<h3>ส่วนที่ 3: สรุป</h3></a>
 <p><p>
 OpenStack ประกอบไปด้วย software component ที่ออกแบบมาให้รองรับธรรมชาติของ distributed systems ที่ประสานงานกันแบบหลวม (หรือ loosely coupling) เมื่อคอมพิวเตอร์ ซอฟต์แวร์ หรือ network ในสภาพแวดล้อมของ OpenStack มีปัญหา software component ที่ไม่ได้รับผลกระทบก็จะยังคงทำงานต่อได้ และหลังจากระบบที่มีปัญหาได้รับการซ่อมแซม ระบบก็จะกลับมาปฏิบัติงานได้ตามปกติ 
 <p><p>
@@ -1032,7 +718,7 @@ OpenStack ประกอบไปด้วย software component ที่อ�
 ไม่ว่าจะใช้วิธีการใดการเรียนรู้ที่ดีที่สุดคือการลองทำด้วยตนเอง ผมหวังว่าท่านจะได้ประโยชน์จาก github page นี้ 
 <p><p>
 <p><p>
-<b>อืนๆ</b>
+<h3>ส่วนที่ 4: อื่นๆ</h3></a>
 <p><p>
 <b>การติดตั้ง galera mariadb</b>
 <pre>
@@ -1197,7 +883,6 @@ $
 <li> ให้ลอง ssh จาก cirros1 ไปยัง cirros2 อีกครั้ง 
 <li> ให้ลอง ping google.com ทำได้หรือไม่ เพราะอะไร 
 </ul>
-ดูตัวอย่างได้ที่ <a href="https://www.youtube.com/watch?v=uXjlmfOvFCs&index=10&list=PLmUxMbTCUhr4vYsaeEKVkvAGF5K1Tw8oJ&t=1484s">youtube video ทดสอบ OpenStack</a>
 </td></tr></table>
 <h3>อ้างอิง</h3>
 <p><p>
